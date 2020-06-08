@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <style>
+    .done_test {
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <v-flex xs12 sm6 offset-sm3>
+
+        <v-text-field
+                clearable
+                v-model="todoTitle"
+                id="newTodo"
+                name="newTodo"
+                label="Введите название задачи"
+                @keyup.enter="addTodo"
+        >
+        </v-text-field>
+      <!--<v-text-field
+              v-model="email"
+              :rules="emailRules"
+              label="E-mail"
+              required>
+      </v-text-field>
+
+      <v-select
+              v-model="select"
+              :items="itemsForm"
+              :rules="[v => !!v || 'Item is required']"
+              label="Item"
+              required>
+      </v-select>
+
+      <v-checkbox
+              v-model="checkbox"
+              :rules="[v => !!v || 'You must agree to continue!']"
+              label="Do you agree?"
+              required>
+
+      </v-checkbox>-->
+
+  </v-flex>
+  <v-app id="inspire">
+    <v-layout row>
+      <v-flex xs12 sm6 offset-sm3>
+        <v-card>
+          <v-toolbar color="cyan" dark>
+            <v-toolbar-side-icon></v-toolbar-side-icon>
+
+            <v-subheader class="subheading" v-if="users.length === 0">
+              У вас 0 задач, добавьте новую
+            </v-subheader>
+            <v-subheader class="subheading" v-else>
+              Ваши задачи: <b style="color: red; margin-left: 5px;"> {{users.length}}</b>
+            </v-subheader>
+
+            <v-spacer></v-spacer>
+
+            <v-btn icon>
+              <v-icon>search</v-icon>
+            </v-btn>
+          </v-toolbar>
+
+          <v-list two-line>
+            <template v-for="(user, index) in users">
+              <v-list-tile avatar @click="">
+                <v-list-tile-action>
+                  <v-checkbox>
+                  </v-checkbox>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>
+                    {{user.gorod | capitalize}}
+                  </v-list-tile-title>
+                </v-list-tile-content>
+                <v-btn icon ripple color="red">
+                  <v-icon class="white--text">close</v-icon>
+                </v-btn>
+                </v-list-tile>
+            </template>
+          </v-list>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-app>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                isDark: true,
+                show: true,
+                todoTitle: '',
+                users: []
+            }
+        },
+        created() {
+            fetch('/api/users', {
+                method: 'get'
+            })
+                .then(res => res.json())
+                .then(users => {
+                    this.users = users
+                    console.log(users)
+                })
+                .catch(e => console.log(e))
+        },
+        methods: {
+            addTodo() {
+                const title = this.todoTitle.trim()
+                if (!title) {
+                    return
+                }
+                this.todos.push({
+                    title: title,
+                    id: Math.random(),
+                    done: false,
+                    date: new Date(),
+                    avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg'
+                })
+                this.todoTitle = ''
+            },
+            removeTodo(id) {
+                this.users = this.users.filter(t => t.id !== id)
+            }
+        },
+        filters: {
+            capitalize(value) {
+                return value.toString().charAt(0).toUpperCase() + value.slice(1)
+            },
+            date(value) {
+                return new Intl.DateTimeFormat('ru-RU', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: '2-digit'
+                }).format(new Date(value))
+            }
+        }
+    })
+</script>
+</body>
+</html>
